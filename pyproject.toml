@@ -1,0 +1,11 @@
+[project]
+name = "DAL"
+version = "0.1.0"
+requires-python = ">=3.12"
+
+dependencies = [
+    "asyncpg>=0.30.0",
+    "fastapi>=0.116.1",
+    "pydantic>=2.11.7",
+    "uvicorn[standard]>=0.35.0",
+]
