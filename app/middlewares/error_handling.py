@@ -4,7 +4,7 @@ from fastapi.responses import ORJSONResponse
 from fastapi.exceptions import RequestValidationError
 from fastapi import HTTPException
 
-from src.utils.logger import get_logger
+from app.utils.logger import get_logger
 
 log = get_logger("errors")
 

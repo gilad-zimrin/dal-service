@@ -2,8 +2,8 @@ from os import getenv
 
 import uvicorn
 
-from src.app import app
-from src.utils.logger import logger
+from app.app import app
+from app.utils.logger import logger
 
 
 def main():
@@ -13,4 +13,4 @@ def main():
 
 if __name__ == '__main__':
     main()
-    
+
