@@ -8,7 +8,11 @@ from src.core.logger import logger
 
 def main():
     logger.info("DAL service starting up..")
-    uvicorn.run(app=app, host='0.0.0.0', port=int(getenv("DAL_PORT", default=8000)))
+    uvicorn.run(
+        app=app,
+        host='0.0.0.0',
+        port=int(getenv("DAL_PORT", default=8000)),
+    )
 
 
 if __name__ == '__main__':

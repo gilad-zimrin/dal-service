@@ -14,7 +14,6 @@ class UserRouter(CRUDRouter):
     def __init__(self):
         super().__init__(prefix="/users", tags=["users"])
 
-        # register the generic CRUD endpoints
         self.register_routes(
             manager_factory=user_manager_factory,
             model_in=User,
