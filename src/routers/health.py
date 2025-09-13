@@ -9,7 +9,6 @@ async def health():
     """
     Returns simple OK status to verify service is alive.
     """
-    raise ValueError("jhlkjh")
     return {"status": "ok"}
 
 @health_router.get("/ready", summary="Readiness check")
