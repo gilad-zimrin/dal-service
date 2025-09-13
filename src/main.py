@@ -2,8 +2,8 @@ from os import getenv
 
 import uvicorn
 
-from app.app import app
-from app.utils.logger import logger
+from src.app_config import app
+from src.core.logger import logger
 
 
 def main():
