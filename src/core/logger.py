@@ -18,8 +18,6 @@ class JSONFormatter(logging.Formatter):
             "module": record.module,
             "function": record.funcName,
             "line": record.lineno,
-            "process": record.process,
-            "thread": record.threadName,
         }
 
         if record.exc_info:
@@ -36,14 +34,13 @@ def get_logger(name: str = "app_logger") -> logging.Logger:
     """
     Return a logger instance configured for JSON output.
     """
-    logger = logging.getLogger(name)
-    if not logger.handlers:
+    new_logger = logging.getLogger(name)
+    if not new_logger.handlers:
         handler = logging.StreamHandler(sys.stdout)
         handler.setFormatter(JSONFormatter())
-        logger.addHandler(handler)
-        logger.setLevel(logging.INFO)  # change to DEBUG for more detail
-        logger.propagate = False
-    return logger
+        new_logger.addHandler(handler)
+        new_logger.setLevel(logging.INFO)  # change to DEBUG for more detail
+        new_logger.propagate = False
+    return new_logger
 
 logger = get_logger()
-
