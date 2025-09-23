@@ -1,6 +1,6 @@
 from src.routers.crud_router import CRUDRouter
 from src.managers.item_manager import ItemManager
-from src.dal.item_dal import ItemPostgresDAL
+from src.dal.postgres_dal.item_dal import ItemPostgresDAL
 from src.models.item import Item
 from src.core.postgres_db_pool import pool
 

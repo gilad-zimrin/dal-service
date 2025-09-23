@@ -1,4 +1,4 @@
-from src.dal.base_postgres_dal import BasePostgresDAL
+from src.dal.postgres_dal.base_postgres_dal import BasePostgresDAL
 from src.models.user import User
 from asyncpg import Pool
 

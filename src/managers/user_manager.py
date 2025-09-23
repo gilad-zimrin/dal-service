@@ -1,7 +1,7 @@
 from src.core.exceptions.configuration_error import ConfigurationError
 from src.managers.base_manager import BaseManager
-from src.dal.user_dal import UserPostgresDAL
-from src.dal.item_dal import ItemPostgresDAL
+from src.dal.postgres_dal.user_dal import UserPostgresDAL
+from src.dal.postgres_dal.item_dal import ItemPostgresDAL
 from src.models.user import UserCreate, ItemCreate
 
 class UserManager(BaseManager[UserPostgresDAL]):

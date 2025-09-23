@@ -1,8 +1,8 @@
 from fastapi import HTTPException
 from src.routers.crud_router import CRUDRouter
 from src.managers.user_manager import UserManager
-from src.dal.user_dal import UserPostgresDAL
-from src.dal.item_dal import ItemPostgresDAL
+from src.dal.postgres_dal.user_dal import UserPostgresDAL
+from src.dal.postgres_dal.item_dal import ItemPostgresDAL
 from src.models.user import User, UserWithItems
 from src.core.postgres_db_pool import pool
 from src.core.unit_of_work import UnitOfWork  # your UoW class

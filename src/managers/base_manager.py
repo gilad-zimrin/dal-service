@@ -1,6 +1,6 @@
 from typing import Any, TypeVar, Generic
 from pydantic import BaseModel
-from src.dal.base_postgres_dal import BasePostgresDAL
+from src.dal.postgres_dal.base_postgres_dal import BasePostgresDAL
 
 DALType = TypeVar("DALType", bound=BasePostgresDAL)
 
