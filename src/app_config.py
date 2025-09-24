@@ -14,7 +14,6 @@ from src.middlewares.error_catching import ErrorLoggingMiddleware
 from src.routers.item_router import ItemRouter
 from src.routers.user_router import UserRouter
 
-postgres_connection_string = getenv("POSTGRES_CONNECTION_STRING")
 
 def routers_registration():
     [app.include_router(router) for router in all_routers]
@@ -29,13 +28,18 @@ async def lifespan(app: FastAPI):
 
     await close_postgres_pool(app)
 
+# TODO override the default fastapi logs with my custom logs
 app = FastAPI(title="Async DAL Service", version="0.1.0", lifespan=lifespan)
 
 app.add_middleware(AuthMiddleware)
 app.add_middleware(ErrorLoggingMiddleware)
 
-all_routers: List[APIRouter] = [health_router, ItemRouter(), UserRouter()]
-
 app.add_exception_handler(RequestValidationError, request_validation_exception_handler) # type: ignore[arg-type]
 app.add_exception_handler(ResponseValidationError, response_validation_exception_handler) # type: ignore[arg-type]
 app.add_exception_handler(HTTPException, http_exception_handler) # type: ignore[arg-type]
+
+all_routers: List[APIRouter] = [
+    health_router,
+    ItemRouter(),
+    UserRouter()
+]

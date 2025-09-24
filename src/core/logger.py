@@ -10,6 +10,7 @@ class JSONFormatter(logging.Formatter):
     """
 
     def format(self, record: logging.LogRecord) -> str:
+        # TODO make this return the real function name and module
         log_record = {
             "timestamp": datetime.utcfromtimestamp(record.created).isoformat() + "Z",
             "level": record.levelname,
@@ -39,7 +40,7 @@ def get_logger(name: str = "app_logger") -> logging.Logger:
         handler = logging.StreamHandler(sys.stdout)
         handler.setFormatter(JSONFormatter())
         new_logger.addHandler(handler)
-        new_logger.setLevel(logging.INFO)  # change to DEBUG for more detail
+        new_logger.setLevel(logging.INFO)
         new_logger.propagate = False
     return new_logger
 

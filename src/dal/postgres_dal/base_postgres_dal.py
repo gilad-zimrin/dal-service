@@ -11,12 +11,18 @@ class BasePostgresDAL:
     """
     This is a subclass for an Item PostgresDal class, implements a generic version of base methods
     """
-    def __init__(self, pool_or_conn: Pool | Connection, table_name: str, model: Type[BaseModel]):
+    def __init__(
+            self,
+            pool_or_conn: Pool | Connection,
+            table_name: str, model: Type[BaseModel],
+            schema_name: str
+    ):
         if not table_name or not model:
             raise ValueError("table_name and model are required.")
         self._pool_or_conn = pool_or_conn
         self.table = table_name
         self.model = model
+        self.schema_name = schema_name
         self.sql_functions: Optional[BaseSQLFunctions] = None
 
     @asynccontextmanager
@@ -30,13 +36,10 @@ class BasePostgresDAL:
             yield conn
             return
 
-        # detect pool vs connection by 'acquire' attribute
         if hasattr(self._pool_or_conn, "acquire"):
-            # it's a Pool
             async with self._pool_or_conn.acquire() as c:
                 yield c
         else:
-            # assume it is a Connection
             yield self._pool_or_conn
 
     async def create(self, data: dict[str, Any], conn: Optional[Connection] = None) -> BaseModel:
@@ -47,50 +50,62 @@ class BasePostgresDAL:
         :return:
         """
         if self.sql_functions and self.sql_functions.create_function:
-            async with self._get_conn(conn) as c:
-                res = await self.sql_functions.call_create(c, data)
-                return self.model(**res) if res else None
+            async with self._get_conn(conn) as connection:
+                response = await self.sql_functions.call_create(connection, data)
+                return response
 
+        # TODO decide what to do if no function
         cols = ", ".join(data.keys())
         placeholders = ", ".join(f"${i}" for i in range(1, len(data) + 1))
-        query = f"INSERT INTO {self.table} ({cols}) VALUES ({placeholders}) RETURNING *"
-        async with self._get_conn(conn) as c:
-            row = await c.fetchrow(query, *data.values())
-        return self.model(**dict(row)) if row else None
+        query = f"INSERT INTO {self.schema_name}.{self.table} ({cols}) VALUES ({placeholders}) RETURNING *"
+        async with self._get_conn(conn) as connection:
+            row = await connection.fetchrow(query, *data.values())
+        return row
 
-    async def get_all(self, conn: Optional[Connection] = None) -> list[BaseModel]:
-        q = f"SELECT * FROM {self.table}"
-        async with self._get_conn(conn) as c:
-            rows = await c.fetch(q)
-        return [self.model(**dict(r)) for r in rows]
+    async def get_by_id(
+            self, object_id: str | int, field_name: str, conn: Optional[Connection] = None
+    ) -> dict | dict[str, Any]:
+        query = f"SELECT * FROM {self.schema_name}.{self.table} WHERE {field_name} = {object_id}"
+        async with self._get_conn(conn) as connection:
+            rows = await connection.fetch(query)
+            if len(rows) > 1:
+                raise ValueError(f"Field {field_name} in not unique on table {self.schema_name}.{self.table}")
+        return dict(rows[0])
+
+    async def get_all(self, conn: Optional[Connection] = None) -> list[dict | dict[str, Any]]:
+        query = f"SELECT * FROM {self.schema_name}.{self.table}"
+        async with self._get_conn(conn) as connection:
+            rows = await connection.fetch(query)
+        return [dict(r) for r in rows]
 
     async def update(self, id_: Any, data: dict[str, Any], conn: Optional[Connection] = None) -> BaseModel | None:
         if self.sql_functions and self.sql_functions.update_function:
-            async with self._get_conn(conn) as c:
-                res = await self.sql_functions.call_update(c, id_, data)
-                return self.model(**res) if res else None
+            async with self._get_conn(conn) as connection:
+                response = await self.sql_functions.call_update(connection, id_, data)
+                # TODO Decide whether the return the entire row or just bool
+                return response
 
         set_clause = ", ".join(f"{k}=${i+1}" for i, k in enumerate(data.keys()))
-        query = f"UPDATE {self.table} SET {set_clause} WHERE id=${len(data) + 1} RETURNING *"
-        async with self._get_conn(conn) as c:
-            row = await c.fetchrow(query, *data.values(), id_)
+        query = f"UPDATE {self.schema_name}.{self.table} SET {set_clause} WHERE id=${len(data) + 1} RETURNING *"
+        async with self._get_conn(conn) as connection:
+            row = await connection.fetchrow(query, *data.values(), id_)
         return self.model(**dict(row)) if row else None
 
     async def delete(self, id_: Any, conn: Optional[Connection] = None) -> bool:
         if self.sql_functions and self.sql_functions.delete_function:
-            async with self._get_conn(conn) as c:
-                res = await self.sql_functions.call_delete(c, id_)
+            async with self._get_conn(conn) as connection:
+                res = await self.sql_functions.call_delete(connection, id_)
                 if isinstance(res, dict):
                     return True
                 return bool(res)
 
-        q = f"DELETE FROM {self.table} WHERE id=$1"
-        async with self._get_conn(conn) as c:
-            result = await c.execute(q, id_)
+        query = f"DELETE FROM {self.schema_name}.{self.table} WHERE id=$1"
+        async with self._get_conn(conn) as connection:
+            result = await connection.execute(query, id_)
         return result.endswith("DELETE 1")
 
     async def execute_query(self, query: str, *args) -> list[Record]:
         """For custom queries. Must be parameterized!"""
-        async with self._pool_or_conn.acquire() as conn:
-            rows = await conn.fetch(query, *args)
+        async with self._pool_or_conn.acquire() as connection:
+            rows = await connection.fetch(query, *args)
         return rows

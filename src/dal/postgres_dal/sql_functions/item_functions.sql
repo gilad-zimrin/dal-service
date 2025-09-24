@@ -1,35 +1,63 @@
-# TODO create my own sql functions
-CREATE OR REPLACE FUNCTION app.item_create(payload jsonb)
-RETURNS items AS $$
+-- TODO decide whether to keep the table's create script here or somewhere else
+-- TODO document functions response types, create returns id, update returns full object, delete returns bool
+CREATE SCHEMA IF NOT EXISTS demo;
+
+
+CREATE TABLE IF NOT EXISTS demo.items (
+    item_id      BIGSERIAL PRIMARY KEY,
+    name         TEXT NOT NULL,
+    description  TEXT,
+    price        NUMERIC(12,2) NOT NULL,
+    created_at   TIMESTAMPTZ DEFAULT now()
+);
+
+
+CREATE OR REPLACE FUNCTION demo.item_create(item_payload jsonb)
+RETURNS BIGINT AS $$
 DECLARE
-    r items%ROWTYPE;
+    new_item_id BIGINT;
 BEGIN
-    INSERT INTO app.items (name, description)
-    VALUES (payload->>'name', (payload->>'description')::text)
-    RETURNING * INTO r;
-    RETURN r;
+    INSERT INTO demo.items (name, description, price)
+    VALUES (
+        item_payload->>'name',
+        item_payload->>'description',
+        (item_payload->>'price')::NUMERIC
+    )
+    RETURNING item_id INTO new_item_id;
+
+    RETURN new_item_id;
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION app.item_update(id_param bigint, payload jsonb)
-RETURNS items AS $$
+
+CREATE OR REPLACE FUNCTION demo.item_update(
+    target_item_id BIGINT,
+    item_payload   jsonb
+)
+RETURNS demo.items AS $$
 DECLARE
-    r items%ROWTYPE;
+    updated_item demo.items%ROWTYPE;
 BEGIN
-    UPDATE app.items
+    UPDATE demo.items
     SET
-      name = COALESCE(payload->>'name', name),
-      description = COALESCE(payload->>'description', description)
-    WHERE id = id_param
-    RETURNING * INTO r;
-    RETURN r;
+        name        = COALESCE(item_payload->>'name', name),
+        description = COALESCE(item_payload->>'description', description),
+        price       = COALESCE((item_payload->>'price')::NUMERIC, price)
+    WHERE item_id = target_item_id
+    RETURNING * INTO updated_item;
+
+    RETURN updated_item;
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION app.item_delete(id_param bigint)
-RETURNS boolean AS $$
+
+CREATE OR REPLACE FUNCTION demo.item_delete(target_item_id BIGINT)
+RETURNS BOOLEAN AS $$
+DECLARE
+    deleted_count INT;
 BEGIN
-    DELETE FROM app.items WHERE id = id_param;
-    RETURN TRUE;
+    DELETE FROM demo.items WHERE item_id = target_item_id;
+    GET DIAGNOSTICS deleted_count = ROW_COUNT;
+    RETURN deleted_count > 0;
 END;
 $$ LANGUAGE plpgsql;
