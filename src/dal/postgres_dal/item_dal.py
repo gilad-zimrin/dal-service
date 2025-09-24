@@ -1,12 +1,12 @@
+from os import getenv
+
 from src.dal.postgres_dal.base_postgres_dal import BasePostgresDAL
 from asyncpg import Pool, Connection
 
 from src.dal.postgres_dal.sql_functions_model.item_sql_functions import ItemSQLFunctions
 from src.models.user import ItemCreate
 
-
-# TODO add schema name (maybe for different schemas) to env
-schema_name = 'demo'
+schema_name = getenv('POSTGRES_DEMO_SCHEMA_NAME')
 
 class ItemPostgresDAL(BasePostgresDAL):
     def __init__(self, pool_or_conn: Pool | Connection):

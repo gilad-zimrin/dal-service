@@ -83,7 +83,6 @@ class BasePostgresDAL:
         if self.sql_functions and self.sql_functions.update_function:
             async with self._get_conn(conn) as connection:
                 response = await self.sql_functions.call_update(connection, id_, data)
-                # TODO Decide whether the return the entire row or just bool
                 return response
 
         set_clause = ", ".join(f"{k}=${i+1}" for i, k in enumerate(data.keys()))
