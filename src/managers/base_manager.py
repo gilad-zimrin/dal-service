@@ -1,10 +1,12 @@
-from typing import Any, TypeVar, Generic
+from abc import abstractmethod, ABC
+from typing import Any, Generic
+
 from pydantic import BaseModel
 
 from src.dal.postgres_dal.base_postgres_dal import DALType
 
 
-class BaseManager(Generic[DALType]):
+class BaseManager(Generic[DALType], ABC):
     """
     BaseManager provides generic CRUD operations by delegating to a DAL.
     Each entity-specific manager should inherit from this class and can
@@ -12,7 +14,12 @@ class BaseManager(Generic[DALType]):
     """
     def __init__(self, dal: DALType):
         self.dal: DALType = dal
-        self.unique_field_name = None
+
+    @property
+    @abstractmethod
+    def unique_field_name(self) -> str:
+        """The unique column for this object, will be used at 'get_by_id'"""
+        pass
 
     async def create(self, data: dict[str, Any]) -> dict[str, Any]:
         """

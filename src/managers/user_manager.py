@@ -9,6 +9,10 @@ class UserManager(BaseManager[UserPostgresDAL]):
         super().__init__(user_dal)
         self.item_dal = item_dal
 
+    @property
+    def unique_field_name(self) -> str:
+        return "User_id"
+
     async def create_user_with_items(self, user: UserCreate, items: list[ItemCreate]):
         if not self.item_dal:
             raise ConfigurationError("User manager doesn't have item_dal configured")

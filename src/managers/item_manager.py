@@ -4,4 +4,7 @@ from src.dal.postgres_dal.item_dal import ItemPostgresDAL
 class ItemManager(BaseManager):
     def __init__(self, dal: ItemPostgresDAL):
         super().__init__(dal)
-        self.unique_field_name = 'item_id'
+
+    @property
+    def unique_field_name(self) -> str:
+        return "Item_id"
