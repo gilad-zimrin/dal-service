@@ -1,8 +1,7 @@
 from typing import Any, TypeVar, Generic
 from pydantic import BaseModel
-from src.dal.postgres_dal.base_postgres_dal import BasePostgresDAL
 
-DALType = TypeVar("DALType", bound=BasePostgresDAL)
+from src.dal.postgres_dal.base_postgres_dal import DALType
 
 
 class BaseManager(Generic[DALType]):
@@ -15,7 +14,7 @@ class BaseManager(Generic[DALType]):
         self.dal: DALType = dal
         self.unique_field_name = None
 
-    async def create(self, data: dict[str, Any]) -> BaseModel:
+    async def create(self, data: dict[str, Any]) -> dict[str, Any]:
         """
         Create a new entity using DAL.
         """

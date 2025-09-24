@@ -1,7 +1,8 @@
 from contextlib import asynccontextmanager
-from typing import Type, Any, Optional
-from pydantic import BaseModel
+from typing import Type, Any, Optional, TypeVar
+
 from asyncpg import Pool, Record, Connection
+from pydantic import BaseModel
 
 from src.dal.postgres_dal.sql_functions_model.base_sql_functions import BaseSQLFunctions
 
@@ -42,7 +43,7 @@ class BasePostgresDAL:
         else:
             yield self._pool_or_conn
 
-    async def create(self, data: dict[str, Any], conn: Optional[Connection] = None) -> BaseModel:
+    async def create(self, data: dict[str, Any], conn: Optional[Connection] = None) -> dict[str, Any]:
         """
         A base version of creating entity in postgres, will use a sql function if it exists
         :param data:
@@ -109,3 +110,5 @@ class BasePostgresDAL:
         async with self._pool_or_conn.acquire() as connection:
             rows = await connection.fetch(query, *args)
         return rows
+
+DALType = TypeVar("DALType", bound=BasePostgresDAL)

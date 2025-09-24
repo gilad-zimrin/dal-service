@@ -5,10 +5,8 @@ from src.dal.postgres_dal.user_dal import UserPostgresDAL
 from src.dal.postgres_dal.item_dal import ItemPostgresDAL
 from src.models.user import User, UserWithItems
 from src.core.postgres_db_pool import postgres_connection_pool
-from src.core.unit_of_work import UnitOfWork  # your UoW class
+from src.core.unit_of_work import UnitOfWork
 
-def user_manager_factory():
-    return UserManager(UserPostgresDAL(postgres_connection_pool))
 
 class UserRouter(CRUDRouter):
     def __init__(self):
@@ -16,7 +14,7 @@ class UserRouter(CRUDRouter):
 
         # TODO update user modules
         self.register_routes(
-            manager_factory=user_manager_factory,
+            model_name='User',
             model_create=User,
             model_update=User,
             model_out=User

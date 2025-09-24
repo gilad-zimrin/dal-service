@@ -1,5 +1,4 @@
 from contextlib import asynccontextmanager
-from os import getenv
 from typing import List
 
 from fastapi import FastAPI, APIRouter
@@ -9,8 +8,13 @@ from core.postgres_db_pool import close_postgres_pool, initialize_postgres_pool
 from routers.health import health_router
 from src.core.exception_handlers import response_validation_exception_handler, http_exception_handler, \
     request_validation_exception_handler
+from src.dal.postgres_dal.item_dal import ItemPostgresDAL
+from src.dal.postgres_dal.user_dal import UserPostgresDAL
+from src.managers.item_manager import ItemManager
+from src.managers.user_manager import UserManager
 from src.middlewares.authorization import AuthMiddleware
 from src.middlewares.error_catching import ErrorLoggingMiddleware
+
 from src.routers.item_router import ItemRouter
 from src.routers.user_router import UserRouter
 
@@ -18,10 +22,19 @@ from src.routers.user_router import UserRouter
 def routers_registration():
     [app.include_router(router) for router in all_routers]
 
+
+def set_app_managers(postgres_connection_pool):
+    app.state.postgres_managers = {
+        'Item': ItemManager(ItemPostgresDAL(postgres_connection_pool)),
+        'User': UserManager(UserPostgresDAL(postgres_connection_pool))
+    }
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await initialize_postgres_pool(app)
     # add for each db
+    set_app_managers(app.state.postgres_pool)
 
     routers_registration()
     yield
