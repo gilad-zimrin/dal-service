@@ -32,7 +32,6 @@ class BaseManager(Generic[DALType], ABC):
         Get a single entity by primary key.
         """
         if not self.unique_field_name:
-            # TODO change into abstract property
             raise NotImplementedError("Unique field name not implemented on manager")
         return await self.dal.get_by_id(id_, self.unique_field_name)
 

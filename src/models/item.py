@@ -11,8 +11,6 @@ class Item(BaseModel):
     created_at: datetime
 
     class Config:
-        # TODO check what this do
-        # orm_mode = True
         extra = "forbid"
 
 
