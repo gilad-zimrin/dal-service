@@ -2,7 +2,6 @@ from typing import Optional, Any
 
 from asyncpg import Connection
 
-from src.core.logger import logger
 from src.core.safe_json_converter import safe_json_dumps
 
 

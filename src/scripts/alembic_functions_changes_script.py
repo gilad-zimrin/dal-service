@@ -1,4 +1,5 @@
 # TODO create an alembic script for postgres database migrations
+# NOTE - This is an only example of a script
 from alembic import op
 import pathlib
 

@@ -1,16 +1,4 @@
--- TODO decide whether to keep the table's create script here or somewhere else
 -- TODO document functions response types, create returns id, update returns full object, delete returns bool
-CREATE SCHEMA IF NOT EXISTS demo;
-
-
-CREATE TABLE IF NOT EXISTS demo.items (
-    item_id      BIGSERIAL PRIMARY KEY,
-    name         TEXT NOT NULL,
-    description  TEXT,
-    price        NUMERIC(12,2) NOT NULL,
-    created_at   TIMESTAMPTZ DEFAULT now()
-);
-
 
 CREATE OR REPLACE FUNCTION demo.item_create(item_payload jsonb)
 RETURNS BIGINT AS $$
