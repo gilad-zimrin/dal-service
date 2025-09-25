@@ -1,6 +1,6 @@
 from os import getenv
 
-from src.dal.postgres_dal.base_postgres_dal import BasePostgresDAL
+from src.databases_access_layer.postgres_dal.base_postgres_dal import BasePostgresDAL
 from src.models.user import User
 from asyncpg import Pool
 

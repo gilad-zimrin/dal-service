@@ -4,7 +4,7 @@ from typing import Type, Any, Optional, TypeVar
 from asyncpg import Pool, Record, Connection
 from pydantic import BaseModel
 
-from src.dal.postgres_dal.sql_functions_model.base_sql_functions import BaseSQLFunctions
+from src.databases_access_layer.postgres_dal.sql_functions_model.base_sql_functions import BaseSQLFunctions
 
 
 # TODO handle postgres exceptions

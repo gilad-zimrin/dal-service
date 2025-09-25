@@ -1,9 +1,9 @@
 from os import getenv
 
-from src.dal.postgres_dal.base_postgres_dal import BasePostgresDAL
+from src.databases_access_layer.postgres_dal.base_postgres_dal import BasePostgresDAL
 from asyncpg import Pool, Connection
 
-from src.dal.postgres_dal.sql_functions_model.item_sql_functions import ItemSQLFunctions
+from src.databases_access_layer.postgres_dal.sql_functions_model.item_sql_functions import ItemSQLFunctions
 from src.models.user import ItemCreate
 
 schema_name = getenv('POSTGRES_DEMO_SCHEMA_NAME')

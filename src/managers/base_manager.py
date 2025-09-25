@@ -3,7 +3,7 @@ from typing import Any, Generic
 
 from pydantic import BaseModel
 
-from src.dal.postgres_dal.base_postgres_dal import DALType
+from src.databases_access_layer.postgres_dal.base_postgres_dal import DALType
 
 
 class BaseManager(Generic[DALType], ABC):

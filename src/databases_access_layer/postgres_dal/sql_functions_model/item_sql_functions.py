@@ -1,4 +1,4 @@
-from src.dal.postgres_dal.sql_functions_model.base_sql_functions import BaseSQLFunctions
+from src.databases_access_layer.postgres_dal.sql_functions_model.base_sql_functions import BaseSQLFunctions
 
 
 class ItemSQLFunctions(BaseSQLFunctions):

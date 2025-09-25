@@ -8,8 +8,8 @@ from core.postgres_db_pool import close_postgres_pool, initialize_postgres_pool
 from routers.health import health_router
 from src.core.exception_handlers import response_validation_exception_handler, http_exception_handler, \
     request_validation_exception_handler
-from src.dal.postgres_dal.item_dal import ItemPostgresDAL
-from src.dal.postgres_dal.user_dal import UserPostgresDAL
+from src.databases_access_layer.postgres_dal.item_dal import ItemPostgresDAL
+from src.databases_access_layer.postgres_dal.user_dal import UserPostgresDAL
 from src.managers.item_manager import ItemManager
 from src.managers.user_manager import UserManager
 from src.middlewares.authorization import AuthMiddleware
