@@ -42,6 +42,8 @@ async def lifespan(app: FastAPI):
     await close_postgres_pool(app)
 
 # TODO override the default fastapi logs with my custom logs
+# TODO support get certain fields
+# TODO support generic filtering (AND, OR, EQUALS)
 app = FastAPI(title="Async DAL Service", version="0.1.0", lifespan=lifespan)
 
 app.add_middleware(AuthMiddleware)

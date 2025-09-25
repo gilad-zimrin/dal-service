@@ -50,18 +50,13 @@ class BasePostgresDAL:
         :param conn:
         :return:
         """
-        if self.sql_functions and self.sql_functions.create_function:
-            async with self._get_conn(conn) as connection:
-                response = await self.sql_functions.call_create(connection, data)
-                return response
+        if not self.sql_functions or not self.sql_functions.create_function:
+            raise NotImplementedError("A create function is not implemented for the model")
 
-        # TODO decide what to do if no function
-        cols = ", ".join(data.keys())
-        placeholders = ", ".join(f"${i}" for i in range(1, len(data) + 1))
-        query = f"INSERT INTO {self.schema_name}.{self.table} ({cols}) VALUES ({placeholders}) RETURNING *"
         async with self._get_conn(conn) as connection:
-            row = await connection.fetchrow(query, *data.values())
-        return row
+            response = await self.sql_functions.call_create(connection, data)
+            return response
+
 
     async def get_by_id(
             self, object_id: str | int, field_name: str, conn: Optional[Connection] = None
@@ -80,29 +75,22 @@ class BasePostgresDAL:
         return [dict(r) for r in rows]
 
     async def update(self, id_: Any, data: dict[str, Any], conn: Optional[Connection] = None) -> BaseModel | None:
-        if self.sql_functions and self.sql_functions.update_function:
-            async with self._get_conn(conn) as connection:
-                response = await self.sql_functions.call_update(connection, id_, data)
-                return response
+        if not self.sql_functions or not self.sql_functions.update_function:
+            raise NotImplementedError("An update function is not implemented for the model")
 
-        set_clause = ", ".join(f"{k}=${i+1}" for i, k in enumerate(data.keys()))
-        query = f"UPDATE {self.schema_name}.{self.table} SET {set_clause} WHERE id=${len(data) + 1} RETURNING *"
         async with self._get_conn(conn) as connection:
-            row = await connection.fetchrow(query, *data.values(), id_)
-        return self.model(**dict(row)) if row else None
+            response = await self.sql_functions.call_update(connection, id_, data)
+            return response
 
     async def delete(self, id_: Any, conn: Optional[Connection] = None) -> bool:
-        if self.sql_functions and self.sql_functions.delete_function:
-            async with self._get_conn(conn) as connection:
-                res = await self.sql_functions.call_delete(connection, id_)
-                if isinstance(res, dict):
-                    return True
-                return bool(res)
-
-        query = f"DELETE FROM {self.schema_name}.{self.table} WHERE id=$1"
+        if not self.sql_functions or not self.sql_functions.delete_function:
+            raise NotImplementedError("A delete function is not implemented for the model")
+        
         async with self._get_conn(conn) as connection:
-            result = await connection.execute(query, id_)
-        return result.endswith("DELETE 1")
+            res = await self.sql_functions.call_delete(connection, id_)
+            if isinstance(res, dict):
+                return True
+            return bool(res)
 
     async def execute_query(self, query: str, *args) -> list[Record]:
         """For custom queries. Must be parameterized!"""
