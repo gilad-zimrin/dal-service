@@ -1,13 +1,17 @@
 from src.core.exceptions.configuration_error import ConfigurationError
 from src.managers.base_manager import BaseManager
-from src.dal.user_dal import UserPostgresDAL
-from src.dal.item_dal import ItemPostgresDAL
+from src.databases_access_layer.postgres_dal.user_dal import UserPostgresDAL
+from src.databases_access_layer.postgres_dal.item_dal import ItemPostgresDAL
 from src.models.user import UserCreate, ItemCreate
 
 class UserManager(BaseManager[UserPostgresDAL]):
     def __init__(self, user_dal: UserPostgresDAL, item_dal: ItemPostgresDAL = None):
         super().__init__(user_dal)
         self.item_dal = item_dal
+
+    @property
+    def unique_field_name(self) -> str:
+        return "User_id"
 
     async def create_user_with_items(self, user: UserCreate, items: list[ItemCreate]):
         if not self.item_dal:

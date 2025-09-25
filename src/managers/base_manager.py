@@ -1,11 +1,12 @@
-from typing import Any, TypeVar, Generic
+from abc import abstractmethod, ABC
+from typing import Any, Generic
+
 from pydantic import BaseModel
-from src.dal.base_postgres_dal import BasePostgresDAL
 
-DALType = TypeVar("DALType", bound=BasePostgresDAL)
+from src.databases_access_layer.postgres_dal.base_postgres_dal import DALType
 
 
-class BaseManager(Generic[DALType]):
+class BaseManager(Generic[DALType], ABC):
     """
     BaseManager provides generic CRUD operations by delegating to a DAL.
     Each entity-specific manager should inherit from this class and can
@@ -14,19 +15,27 @@ class BaseManager(Generic[DALType]):
     def __init__(self, dal: DALType):
         self.dal: DALType = dal
 
-    async def create(self, data: dict[str, Any]) -> BaseModel:
+    @property
+    @abstractmethod
+    def unique_field_name(self) -> str:
+        """The unique column for this object, will be used at 'get_by_id'"""
+        pass
+
+    async def create(self, data: dict[str, Any]) -> dict[str, Any]:
         """
         Create a new entity using DAL.
         """
         return await self.dal.create(data)
 
-    async def get(self, id_: Any) -> BaseModel | None:
+    async def get(self, id_: Any) -> dict | dict[str, Any] | None:
         """
         Get a single entity by primary key.
         """
-        return await self.dal.get(id_)
+        if not self.unique_field_name:
+            raise NotImplementedError("Unique field name not implemented on manager")
+        return await self.dal.get_by_id(id_, self.unique_field_name)
 
-    async def get_all(self) -> list[BaseModel]:
+    async def get_all(self) -> list[dict | dict[str, Any]]:
         """
         Get all entities.
         """
