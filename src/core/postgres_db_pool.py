@@ -1,6 +1,7 @@
 from os import getenv
-from dotenv import load_dotenv
+
 import asyncpg
+from dotenv import load_dotenv
 from fastapi import FastAPI, Request
 
 from src.core.logger import logger

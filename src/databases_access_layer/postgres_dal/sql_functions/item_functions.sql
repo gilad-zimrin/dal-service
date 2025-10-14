@@ -1,21 +1,24 @@
 -- TODO document functions response types, create returns id, update returns full object, delete returns bool
 
 CREATE OR REPLACE FUNCTION demo.item_create(item_payload jsonb)
-RETURNS BIGINT AS $$
+RETURNS demo.items AS $$
 DECLARE
-    new_item_id BIGINT;
+    inserted_item demo.items%ROWTYPE;
 BEGIN
-    INSERT INTO demo.items (name, description, price)
+    INSERT INTO demo.items (name, description, price, company_id, stock)
     VALUES (
         item_payload->>'name',
         item_payload->>'description',
-        (item_payload->>'price')::NUMERIC
+        (item_payload->>'price')::NUMERIC,
+        (item_payload->>'company_id')::BIGINT,
+        (item_payload->>'stock')::INT
     )
-    RETURNING item_id INTO new_item_id;
+    RETURNING * INTO inserted_item;
 
-    RETURN new_item_id;
+    RETURN inserted_item;
 END;
 $$ LANGUAGE plpgsql;
+
 
 
 CREATE OR REPLACE FUNCTION demo.item_update(

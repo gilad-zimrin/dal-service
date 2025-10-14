@@ -12,3 +12,4 @@ class ItemRouter(CRUDRouter):
             model_out=ItemRead
         )
 
+# TODO add restock item route

@@ -21,11 +21,11 @@ class BaseManager(Generic[DALType], ABC):
         """The unique column for this object, will be used at 'get_by_id'"""
         pass
 
-    async def create(self, data: dict[str, Any]) -> dict[str, Any]:
+    async def create(self, new_object: dict[str, Any]) -> dict[str, Any]:
         """
         Create a new entity using DAL.
         """
-        return await self.dal.create(data)
+        return await self.dal.create(new_object)
 
     async def get(self, id_: Any) -> dict | dict[str, Any] | None:
         """
@@ -41,11 +41,12 @@ class BaseManager(Generic[DALType], ABC):
         """
         return await self.dal.get_all()
 
-    async def update(self, id_: Any, data: dict[str, Any]) -> BaseModel | None:
+
+    async def update(self, id_: Any, updated_object: dict[str, Any]) -> BaseModel | None:
         """
         Update an entity by primary key.
         """
-        return await self.dal.update(id_, data)
+        return await self.dal.update(id_, updated_object)
 
     async def delete(self, id_: Any) -> bool:
         """

@@ -15,11 +15,18 @@ async def response_validation_exception_handler(request: Request, exc: ResponseV
 
     logger.exception(
         f"Response Validation error on {route_path} in {func_name}",
-        exc_info=True,
+        exc_info=True, extra={"error": exc.errors()}
     )
     return ORJSONResponse(
-        status_code=500,
-        content={"detail": "Response validation failed", "errors": exc.errors()},
+        status_code=422,  # Standard HTTP status code for validation errors
+        content={"detail": "Response validation failed", "errors": [
+        {
+            "loc": error["loc"],
+            "msg": error["msg"],
+            "type": error["type"],
+        }
+        for error in exc.errors()
+    ]},
     )
 
 async def request_validation_exception_handler(request: Request, exc: RequestValidationError):
@@ -32,8 +39,15 @@ async def request_validation_exception_handler(request: Request, exc: RequestVal
         exc_info=True,
     )
     return ORJSONResponse(
-        status_code=500,
-        content={"detail": "Request validation failed", "errors": exc.errors()},
+        status_code=422,  # Standard HTTP status code for validation errors
+        content={"detail": "Request validation failed", "errors": [
+        {
+            "loc": error["loc"],
+            "msg": error["msg"],
+            "type": error["type"],
+        }
+        for error in exc.errors()
+    ]},
     )
 
 async def http_exception_handler(request: Request, exc: HTTPException):
