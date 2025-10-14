@@ -50,7 +50,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(title="Async DAL Service", version="0.1.0", lifespan=lifespan)
 
 app.add_middleware(AuthMiddleware)
-# app.add_middleware(ErrorLoggingMiddleware)
+app.add_middleware(ErrorLoggingMiddleware)
 
 app.add_exception_handler(RequestValidationError, request_validation_exception_handler) # type: ignore[arg-type]
 app.add_exception_handler(ResponseValidationError, response_validation_exception_handler) # type: ignore[arg-type]
