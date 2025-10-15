@@ -4,26 +4,13 @@ from pydantic import BaseModel, StrictStr, StrictInt, StrictFloat, field_validat
 
 
 class Item(BaseModel):
-    item_id: Optional[StrictInt]
+    item_id: StrictInt
     company_id: StrictInt
     name: StrictStr
     price: StrictFloat
     stock: StrictInt
     description: Optional[StrictStr]
     created_at: datetime
-
-    class Config:
-        extra = "forbid"
-
-# TODO create a smaller version of these types, since that inherit, create a general convention for models
-class ItemCreate(Item):
-    item_id: None = None
-    company_id: StrictInt
-    name: StrictStr
-    price: StrictFloat
-    stock: StrictInt
-    description: Optional[StrictStr]
-    created_at: Optional[datetime] = None
 
     @field_validator('stock')
     @classmethod
@@ -39,6 +26,14 @@ class ItemCreate(Item):
             raise ValueError('price must be greater than 0')
         return v
 
+    class Config:
+        extra = "forbid"
+
+class ItemCreate(Item):
+    item_id: None = None
+    company_id: StrictInt
+    created_at: None = None
+
 class ItemUpdate(Item):
     item_id: None = None
     company_id: Optional[StrictInt] = None
@@ -49,10 +44,4 @@ class ItemUpdate(Item):
     created_at: Optional[datetime] = None
 
 class ItemRead(Item):
-    item_id: StrictInt
-    company_id: StrictInt
-    name: StrictStr
-    price: StrictFloat
-    stock: StrictInt
-    description: Optional[StrictStr]
-    created_at: datetime
+    pass
