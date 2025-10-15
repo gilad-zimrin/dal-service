@@ -1,4 +1,4 @@
-from typing import Optional, Any
+from typing import Optional, Any, List
 
 from asyncpg import Connection
 
@@ -13,26 +13,37 @@ class BaseSQLFunctions:
         delete_function: Optional[str] = None,
         schema: Optional[str] = None,
     ):
+        """
+
+        :param create_function: The name of the create function (if such function exists)
+        :param update_function: The name of the update function (if such function exists)
+        :param delete_function: The name of the delete function (if such function exists)
+        :param schema: The name of the schema of the functions
+        """
         self.create_function: str = create_function
         self.update_function: str = update_function
         self.delete_function: str = delete_function
         self.schema = schema
+    # TODO where to add entity-specific functions?
 
     def _qualify(self, function_name: str) -> str:
         if self.schema:
             return f"{self.schema}.{function_name}"
         return function_name
 
-    async def call_create(self, conn: Connection, payload: dict[str, Any]) -> Any:
+    async def call_create(
+            self, conn: Connection, payload: dict[str, Any]
+    ) -> dict[str, str | int]:
         if not self.create_function:
             raise NotImplementedError("create function not configured")
+
         function_name = self._qualify(self.create_function)
         payload_text = safe_json_dumps(payload)
         # TODO document function signatures conventions
-        new_id = await conn.fetchval(f"SELECT * FROM {function_name}($1::jsonb)", payload_text)
-        return {'id': new_id}
+        row = await conn.fetchrow(f"SELECT * FROM {function_name}($1::jsonb)", payload_text)
+        return dict(row)
 
-    async def call_update(self, conn: Connection, id_value: Any, payload: dict[str, Any]) -> Any:
+    async def call_update(self, conn: Connection, id_value: Any, payload: dict[str, Any]) -> dict[str, Any]:
         if not self.update_function:
             raise NotImplementedError("update function not configured")
         function_name = self._qualify(self.update_function)

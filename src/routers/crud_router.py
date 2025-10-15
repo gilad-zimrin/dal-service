@@ -4,7 +4,6 @@ from fastapi import APIRouter, Request, Depends
 from pydantic import BaseModel
 
 from src.managers.base_manager import BaseManager
-from src.models.create_response import CreateResponse
 
 
 class CRUDRouter(APIRouter):
@@ -34,12 +33,10 @@ class CRUDRouter(APIRouter):
         def get_manager(request: Request) -> BaseManager:
             return request.app.state.postgres_managers[model_name]
 
-        # TODO in the crud router, no need to Depend on a new manager
         if "create" in include:
-            @self.post("/", response_model=CreateResponse)
+            @self.post("/", response_model=model_out)
             async def create_object(data: model_create, manager: BaseManager = Depends(get_manager)):
-                response = await manager.create(data.model_dump())
-                return CreateResponse(**response)
+                return await manager.create(data.model_dump())
 
         if "get" in include:
             @self.get("/{id_}", response_model=model_out)

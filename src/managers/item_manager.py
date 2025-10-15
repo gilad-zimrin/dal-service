@@ -7,4 +7,4 @@ class ItemManager(BaseManager):
 
     @property
     def unique_field_name(self) -> str:
-        return "Item_id"
+        return "item_id"
