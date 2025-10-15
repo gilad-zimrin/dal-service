@@ -21,9 +21,9 @@ all_entities = [
     OrderEntity()
 ]
 
-def configure_entities(postgres_connection_pool):
+def configure_entities_to_app(postgres_connection_pool):
     """
-    This function configures all entities
+    This function configures all entities into the fastapi app
     :param postgres_connection_pool:
     :return:
     """
@@ -39,7 +39,7 @@ async def lifespan(app: FastAPI):
     await initialize_postgres_pool(app)
     # add for each db
 
-    configure_entities(app.state.postgres_pool)
+    configure_entities_to_app(app.state.postgres_pool)
     yield
 
     await close_postgres_pool(app)
