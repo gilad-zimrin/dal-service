@@ -1,44 +1,45 @@
 from contextlib import asynccontextmanager
-from typing import List
 
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI
 from fastapi.exceptions import ResponseValidationError, RequestValidationError, HTTPException
 
 from core.postgres_db_pool import close_postgres_pool, initialize_postgres_pool
 from src.core.exception_handlers import response_validation_exception_handler, http_exception_handler, \
     request_validation_exception_handler
-from src.managers import ItemManager, ItemPostgresDAL, CustomerManager, CustomerPostgresDAL, CompanyManager, \
-    CompanyPostgresDAL, OrderManager, OrderPostgresDAL
+from src.entities.company_entity import CompanyEntity
+from src.entities.customer_entity import CustomerEntity
+from src.entities.item_entity import ItemEntity
+from src.entities.order_entity import OrderEntity
 from src.middlewares.authorization import AuthMiddleware
 from src.middlewares.error_catching import ErrorLoggingMiddleware
-from src.routers import health_router, ItemRouter, CustomerRouter, CompanyRouter, OrderRouter
+from src.routers import health_router
 
-all_routers: List[APIRouter] = [
-    health_router,
-    ItemRouter(),
-    CustomerRouter(),
-    CompanyRouter(),
-    OrderRouter()
+all_entities = [
+    ItemEntity(),
+    CompanyEntity(),
+    CustomerEntity(),
+    OrderEntity()
 ]
 
-# TODO create abstract class EntityConfig
-def configure_routes(postgres_connection_pool):
-    app.state.postgres_managers = {
-        'Item': ItemManager(ItemPostgresDAL(postgres_connection_pool)),
-        'Customer': CustomerManager(CustomerPostgresDAL(postgres_connection_pool)),
-        'Company': CompanyManager(CompanyPostgresDAL(postgres_connection_pool)),
-        'Order': OrderManager(
-            OrderPostgresDAL(postgres_connection_pool), ItemManager(ItemPostgresDAL(postgres_connection_pool))
-        )
-    }
-    [app.include_router(router) for router in all_routers]
+def configure_entities_to_app(postgres_connection_pool):
+    """
+    This function configures all entities into the fastapi app
+    :param postgres_connection_pool:
+    :return:
+    """
+    app.include_router(health_router)
+
+    app.state.postgres_managers = {}
+    for entity in all_entities:
+        app.state.postgres_managers[entity.entity_name] = entity.get_manager(postgres_connection_pool)
+        app.include_router(entity.entity_router())
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await initialize_postgres_pool(app)
     # add for each db
 
-    configure_routes(app.state.postgres_pool)
+    configure_entities_to_app(app.state.postgres_pool)
     yield
 
     await close_postgres_pool(app)

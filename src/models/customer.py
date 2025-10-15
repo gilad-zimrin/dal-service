@@ -3,7 +3,7 @@ from typing import Optional
 
 from pydantic import BaseModel, StrictInt, StrictStr, EmailStr, field_validator
 
-class Customers(BaseModel):
+class Customer(BaseModel):
     customer_id: StrictInt
     username: StrictStr
     password: StrictStr
@@ -24,14 +24,14 @@ class Customers(BaseModel):
             raise ValueError('Disposable email addresses are not allowed')
         return v
 
-class CustomerCreate(Customers):
+class CustomerCreate(Customer):
     customer_id: None = None
 
-class CustomerUpdate(Customers):
+class CustomerUpdate(Customer):
     customer_id: None = None
     username: Optional[StrictStr] = None
     password: Optional[StrictStr] = None
     email: Optional[StrictStr] = None
 
-class CustomerRead(Customers):
+class CustomerRead(Customer):
     pass
