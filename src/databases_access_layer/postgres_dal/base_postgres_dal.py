@@ -3,7 +3,6 @@ from string import Template
 from typing import Any, Optional, TypeVar
 
 from asyncpg import Pool, Record, Connection
-from pydantic import BaseModel
 
 from src.core.exceptions.object_not_found_error import ObjectNotFoundError
 from src.databases_access_layer.postgres_dal.functions_model.base_sql_functions import BaseSQLFunctions
@@ -64,10 +63,9 @@ class BasePostgresDAL:
     async def get_by_id(
             self, object_id: str | int, unique_field_name: str, conn: Optional[Connection] = None
     ) -> dict | dict[str, Any]:
-
         get_by_id_query = Template(self.get_by_id_query).substitute({"object_id": object_id}) \
             if self.get_by_id_query \
-            else f"SELECT * FROM {self.schema_name}.{self.table} WHERE {unique_field_name} = {object_id}"
+            else f"SELECT * FROM {self.schema_name}.{self.table} WHERE {unique_field_name} = '{object_id}'"
 
         async with self._get_conn(conn) as connection:
             rows = await connection.fetch(get_by_id_query)
@@ -75,9 +73,10 @@ class BasePostgresDAL:
                 raise ValueError(f"Field {unique_field_name} in not unique on table {self.schema_name}.{self.table}")
             if len(rows) == 0:
                 raise ObjectNotFoundError(
-                    f'An object with id {object_id} not found on table {self.schema_name}.{self.table}'
+                    f'An object with {unique_field_name} {object_id} not found on table {self.schema_name}.{self.table}'
                 )
         return dict(rows[0])
+
 
     async def get_all(self, conn: Optional[Connection] = None) -> list[dict | dict[str, Any]]:
         get_all_query = self.get_all_query if self.get_all_query else f"SELECT * FROM {self.schema_name}.{self.table}"

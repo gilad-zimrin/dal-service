@@ -3,6 +3,7 @@ from typing import Any, Generic
 
 from pydantic import BaseModel
 
+from src.core.security import get_password_hash
 from src.databases_access_layer.postgres_dal.base_postgres_dal import DALType
 
 
@@ -25,6 +26,8 @@ class BaseManager(Generic[DALType], ABC):
         """
         Create a new entity using DAL.
         """
+        if 'password' in new_object:
+            new_object['password'] = get_password_hash(new_object['password'])
         return await self.dal.create(new_object)
 
     async def get(self, id_: Any) -> dict | dict[str, Any] | None:
@@ -46,6 +49,8 @@ class BaseManager(Generic[DALType], ABC):
         """
         Update an entity by primary key.
         """
+        if updated_object.get('password'):
+            updated_object['password'] = get_password_hash(updated_object['password'])
         return await self.dal.update(id_, updated_object)
 
     async def delete(self, id_: Any) -> bool:

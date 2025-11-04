@@ -6,19 +6,18 @@ from fastapi.exceptions import ResponseValidationError, RequestValidationError, 
 from core.postgres_db_pool import close_postgres_pool, initialize_postgres_pool
 from src.core.exception_handlers import response_validation_exception_handler, http_exception_handler, \
     request_validation_exception_handler
-from src.entities.company_entity import CompanyEntity
-from src.entities.customer_entity import CustomerEntity
-from src.entities.item_entity import ItemEntity
-from src.entities.order_entity import OrderEntity
+from src.entities import AdminEntity, CompanyEntity, CustomerEntity, ItemEntity, OrderEntity
 from src.middlewares.authorization import AuthMiddleware
 from src.middlewares.error_catching import ErrorLoggingMiddleware
 from src.routers import health_router
+from src.routers.auth_router import security_router
 
 all_entities = [
     ItemEntity(),
     CompanyEntity(),
     CustomerEntity(),
-    OrderEntity()
+    OrderEntity(),
+    AdminEntity()
 ]
 
 def configure_entities_to_app(postgres_connection_pool):
@@ -28,6 +27,7 @@ def configure_entities_to_app(postgres_connection_pool):
     :return:
     """
     app.include_router(health_router)
+    app.include_router(security_router)
 
     app.state.postgres_managers = {}
     for entity in all_entities:

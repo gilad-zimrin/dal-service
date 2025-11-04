@@ -7,9 +7,13 @@ dependencies = [
     "aiohttp>=3.12.15",
     "alembic>=1.16.5",
     "asyncpg>=0.30.0",
+    "bcrypt==4.0.1",
     "fastapi>=0.116.1",
     "orjson>=3.11.3",
+    "passlib[bcrypt]>=1.7.4",
     "pydantic[email]>=2.11.7",
+    "pyjwt>=2.10.1",
     "python-dotenv>=1.1.1",
+    "python-multipart>=0.0.20",
     "uvicorn[standard]>=0.35.0",
 ]

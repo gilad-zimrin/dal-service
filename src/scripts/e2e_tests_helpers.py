@@ -1,11 +1,18 @@
 import random
 import string
-
+from os import getenv
+from dotenv import load_dotenv
 
 AUTH_TOKEN = "super_secret_token"
+BASE_URL = "http://localhost:8000"
+
+load_dotenv()
+
+admin_token = getenv("ADMIN_TOKEN")
 
 HEADERS = {
-    "Authorization": AUTH_TOKEN,
+    "authorization": f"Bearer {admin_token}",
+    "dal_auth_token": AUTH_TOKEN,
     "Content-Type": "application/json"
 }
 
@@ -25,7 +32,7 @@ async def safe_request(method, client, url, **kwargs):
             return await resp.json()
     except Exception as e:
         print("Error during request:", e)
-        raise  # stop the script
+        raise
 
 async def create_entity(client, url, payload):
     return await safe_request("POST", client, url, json=payload)

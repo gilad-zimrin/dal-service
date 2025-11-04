@@ -17,8 +17,8 @@ NUM_ORDER_ITEMS = 1
 # --- toggle whole-entity tests ---
 is_test_companies = True
 is_test_customers = True
-is_test_items = True
-is_test_orders = True
+is_test_items = False
+is_test_orders = False
 
 # --- toggle operations ---
 is_create = True

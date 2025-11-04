@@ -1,4 +1,5 @@
 import re
+from datetime import datetime
 from typing import Optional
 
 from pydantic import BaseModel, StrictInt, StrictStr, EmailStr, field_validator
@@ -6,14 +7,12 @@ from pydantic import BaseModel, StrictInt, StrictStr, EmailStr, field_validator
 from src.models.secure_base_model import SecureBaseModel
 
 
-class Customer(BaseModel):
-    customer_id: StrictInt
+class Admin(BaseModel):
+    admin_id: StrictInt
     username: StrictStr
     password: StrictStr
     email: EmailStr
-    name: Optional[StrictStr] = None
-    age: Optional[StrictInt] = None
-    location: Optional[StrictStr] = None
+    created_at: Optional[datetime]
 
     @field_validator('password')
     @classmethod
@@ -36,14 +35,16 @@ class Customer(BaseModel):
             raise ValueError('Disposable email addresses are not allowed')
         return v
 
-class CustomerCreate(Customer):
-    customer_id: None = None
+class AdminCreate(Admin):
+    admin_id: None = None
+    created_at: None = None
 
-class CustomerUpdate(Customer):
-    customer_id: None = None
+class AdminUpdate(Admin):
+    admin_id: None = None
     username: Optional[StrictStr] = None
     password: Optional[StrictStr] = None
     email: Optional[StrictStr] = None
+    created_at: None = None
 
     @field_validator('password')
     @classmethod
@@ -52,5 +53,5 @@ class CustomerUpdate(Customer):
             return cls.validate_password(v)  # Reuse base validation
         return v
 
-class CustomerRead(Customer, SecureBaseModel):
-    pass
+class AdminRead(Admin, SecureBaseModel):
+    created_at: datetime

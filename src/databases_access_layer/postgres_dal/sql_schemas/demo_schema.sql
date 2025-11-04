@@ -64,3 +64,12 @@ CREATE TABLE IF NOT EXISTS demo.order_items (
     quantity      INT NOT NULL CHECK (quantity > 0),
     unit_price    NUMERIC(12,2) NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS demo.admins (
+    admin_id      BIGSERIAL PRIMARY KEY,
+    username      TEXT UNIQUE NOT NULL,
+    password TEXT NOT NULL,
+    email         TEXT,
+    created_at    TIMESTAMP WITHOUT TIME ZONE DEFAULT now()
+);
+
