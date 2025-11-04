@@ -13,6 +13,7 @@ from src.entities.order_entity import OrderEntity
 from src.middlewares.authorization import AuthMiddleware
 from src.middlewares.error_catching import ErrorLoggingMiddleware
 from src.routers import health_router
+from src.routers.auth_router import security_router
 
 all_entities = [
     ItemEntity(),
@@ -28,6 +29,7 @@ def configure_entities_to_app(postgres_connection_pool):
     :return:
     """
     app.include_router(health_router)
+    app.include_router(security_router)
 
     app.state.postgres_managers = {}
     for entity in all_entities:
@@ -50,7 +52,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(title="Async DAL Service", version="0.1.0", lifespan=lifespan)
 
 app.add_middleware(AuthMiddleware)
-app.add_middleware(ErrorLoggingMiddleware)
+# app.add_middleware(ErrorLoggingMiddleware)
 
 app.add_exception_handler(RequestValidationError, request_validation_exception_handler) # type: ignore[arg-type]
 app.add_exception_handler(ResponseValidationError, response_validation_exception_handler) # type: ignore[arg-type]
