@@ -18,7 +18,6 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         if client_ip not in self.ip_request_log:
             self.ip_request_log[client_ip] = []
 
-        # Keep only requests in current window
         request_times = [
             timestamp for timestamp in self.ip_request_log[client_ip]
             if current_time - timestamp < self.window_size
