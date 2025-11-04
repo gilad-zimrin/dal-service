@@ -1,3 +1,6 @@
+from fastapi import Depends
+
+from src.core.security import require_role, Role
 from src.models.customer import CustomerCreate, CustomerUpdate, CustomerRead
 from src.routers.crud_router import CRUDRouter
 
@@ -9,5 +12,6 @@ class CustomerRouter(CRUDRouter):
             model_name='Customer',
             model_create=CustomerCreate,
             model_update=CustomerUpdate,
-            model_out=CustomerRead
+            model_out=CustomerRead,
+            dependencies=[Depends(require_role(Role.company))]
         )

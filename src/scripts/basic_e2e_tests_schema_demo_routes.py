@@ -9,8 +9,8 @@ from src.scripts.e2e_tests_helpers import rand_str, rand_enum, create_entity, ge
 BASE_URL = "http://localhost:8000"
 
 NUM_ITEMS = 1
-NUM_COMPANIES = 10
-NUM_CUSTOMERS = 10
+NUM_COMPANIES = 1
+NUM_CUSTOMERS = 1
 NUM_ORDERS = 1
 NUM_ORDER_ITEMS = 1
 
@@ -24,7 +24,7 @@ is_test_orders = False
 is_create = True
 is_get = True
 is_update = True
-is_delete = False
+is_delete = True
 is_list = True
 
 main_count = 1

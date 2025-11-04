@@ -51,6 +51,3 @@ class CompanyUpdate(Company):
 
 class CompanyRead(Company, SecureBaseModel):
     register_time: datetime
-
-    class Config:
-        fields = {'password': {'exclude': True}}

@@ -6,10 +6,7 @@ from fastapi.exceptions import ResponseValidationError, RequestValidationError, 
 from core.postgres_db_pool import close_postgres_pool, initialize_postgres_pool
 from src.core.exception_handlers import response_validation_exception_handler, http_exception_handler, \
     request_validation_exception_handler
-from src.entities.company_entity import CompanyEntity
-from src.entities.customer_entity import CustomerEntity
-from src.entities.item_entity import ItemEntity
-from src.entities.order_entity import OrderEntity
+from src.entities import AdminEntity, CompanyEntity, CustomerEntity, ItemEntity, OrderEntity
 from src.middlewares.authorization import AuthMiddleware
 from src.middlewares.error_catching import ErrorLoggingMiddleware
 from src.routers import health_router
@@ -19,7 +16,8 @@ all_entities = [
     ItemEntity(),
     CompanyEntity(),
     CustomerEntity(),
-    OrderEntity()
+    OrderEntity(),
+    AdminEntity()
 ]
 
 def configure_entities_to_app(postgres_connection_pool):
@@ -52,7 +50,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(title="Async DAL Service", version="0.1.0", lifespan=lifespan)
 
 app.add_middleware(AuthMiddleware)
-# app.add_middleware(ErrorLoggingMiddleware)
+app.add_middleware(ErrorLoggingMiddleware)
 
 app.add_exception_handler(RequestValidationError, request_validation_exception_handler) # type: ignore[arg-type]
 app.add_exception_handler(ResponseValidationError, response_validation_exception_handler) # type: ignore[arg-type]
