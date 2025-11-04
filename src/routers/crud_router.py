@@ -1,4 +1,4 @@
-from typing import Sequence, List
+from typing import Sequence
 
 from fastapi import APIRouter, Request, Depends
 from pydantic import BaseModel

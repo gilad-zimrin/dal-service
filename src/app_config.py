@@ -1,4 +1,5 @@
 from contextlib import asynccontextmanager
+from os import getenv
 
 from fastapi import FastAPI
 from fastapi.exceptions import ResponseValidationError, RequestValidationError, HTTPException
@@ -9,8 +10,12 @@ from src.core.exception_handlers import response_validation_exception_handler, h
 from src.entities import AdminEntity, CompanyEntity, CustomerEntity, ItemEntity, OrderEntity
 from src.middlewares.authorization import AuthMiddleware
 from src.middlewares.error_catching import ErrorLoggingMiddleware
+from src.middlewares.rate_limit import RateLimitMiddleware
 from src.routers import health_router
 from src.routers.auth_router import security_router
+
+rate_window_size = int(getenv("RATE_WINDOW_SIZE", default=60))
+requests_rate_limit = int(getenv("REQUESTS_RATE_LIMIT", default=180))
 
 all_entities = [
     ItemEntity(),
@@ -51,6 +56,7 @@ app = FastAPI(title="Async DAL Service", version="0.1.0", lifespan=lifespan)
 
 app.add_middleware(AuthMiddleware)
 app.add_middleware(ErrorLoggingMiddleware)
+app.add_middleware(RateLimitMiddleware, max_requests=requests_rate_limit, window_size=rate_window_size)
 
 app.add_exception_handler(RequestValidationError, request_validation_exception_handler) # type: ignore[arg-type]
 app.add_exception_handler(ResponseValidationError, response_validation_exception_handler) # type: ignore[arg-type]
